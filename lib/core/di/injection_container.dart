@@ -1,10 +1,5 @@
 import 'package:get_it/get_it.dart';
 import 'package:smart_expense/core/database/app_database.dart';
-import 'package:smart_expense/features/analytics/data/datasources/local/analytics_local_datasource.dart';
-import 'package:smart_expense/features/analytics/data/datasources/local/analytics_local_datasource_impl.dart';
-import 'package:smart_expense/features/analytics/data/repositories/analytics_repository_impl.dart';
-import 'package:smart_expense/features/analytics/domain/repositories/analytics_repository.dart';
-import 'package:smart_expense/features/analytics/presentation/cubit/analytics_cubit.dart';
 import 'package:smart_expense/features/operations/data/datasources/local/debt_local_datasource.dart';
 import 'package:smart_expense/features/operations/data/datasources/local/debt_local_datasource_impl.dart';
 import 'package:smart_expense/features/operations/data/datasources/local/instapay_account_local_datasource.dart';
@@ -51,9 +46,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => AppDatabase());
 
   // DataSource
-  sl.registerLazySingleton<AnalyticsLocalDataSource>(
-    () => AnalyticsLocalDataSourceImpl(sl()),
-  );
+
   sl.registerLazySingleton<CashDrawerLocalDataSource>(
     () => CashDrawerLocalDataSourceImpl(sl()),
   );
@@ -76,10 +69,6 @@ Future<void> init() async {
     () => InstaPayAccountLocalDataSourceImpl(sl()),
   );
 
-  // Repository
-  sl.registerLazySingleton<AnalyticsRepository>(
-    () => AnalyticsRepositoryImpl(sl()),
-  );
   sl.registerLazySingleton<CashDrawerRepository>(
     () => CashDrawerRepositoryImpl(sl()),
   );
@@ -103,9 +92,7 @@ Future<void> init() async {
   );
 
   // Cubit
-  sl.registerLazySingleton(
-    () => AnalyticsCubit(sl<AnalyticsRepository>()),
-  );
+ 
   sl.registerLazySingleton(
     () => CashDrawerCubit(sl<CashDrawerRepository>()),
   );

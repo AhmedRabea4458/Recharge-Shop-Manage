@@ -7,10 +7,6 @@ import 'package:smart_expense/core/database/tables/debtors_table.dart';
 import 'package:smart_expense/core/database/tables/debts_table.dart';
 import 'package:smart_expense/core/database/tables/instapay_accounts_table.dart';
 import 'dart:ui';
-
-import 'package:smart_expense/features/analytics/domain/entities/category_breakdown.dart';
-import 'package:smart_expense/features/analytics/domain/entities/period_spending.dart';
-import 'package:smart_expense/features/analytics/domain/entities/summary_result.dart';
 import 'package:smart_expense/core/errors/exceptions.dart';
 
 import 'tables/cash_drawer_table.dart';
@@ -182,97 +178,7 @@ class AppDatabase extends _$AppDatabase {
     await delete(transactionsTable).go();
   }
 
-  // ── Analytics Methods (keep for backward compatibility) ──
-  Future<SummaryResult> getSummary({DateTime? startDate, DateTime? endDate}) {
-    var query = select(transactionsTable);
-    return query.get().then((transactions) {
-      final filtered = _filterByDate(transactions, startDate, endDate);
-      double totalIncome = 0;
-      double totalExpense = 0;
-
-      for (var transaction in filtered) {
-        if (transaction.type == 'income') {
-          totalIncome += transaction.amount;
-        } else if (transaction.type == 'expense') {
-          totalExpense += transaction.amount;
-        }
-      }
-
-      return SummaryResult(
-        totalIncome: totalIncome,
-        totalExpense: totalExpense,
-        balance: totalIncome - totalExpense,
-      );
-    });
-  }
-
-  Future<List<CategoryBreakdown>> getCategoryBreakdown({DateTime? startDate, DateTime? endDate}) {
-    var query = select(transactionsTable);
-    return query.get().then((transactions) {
-      final filtered = _filterByDate(transactions, startDate, endDate);
-      final Map<String, double> categoryTotals = {};
-
-      for (var transaction in filtered) {
-        if (transaction.type == 'expense') {
-          categoryTotals.update(
-            transaction.category,
-            (value) => value + transaction.amount,
-            ifAbsent: () => transaction.amount,
-          );
-        }
-      }
-
-      final totalExpenses = categoryTotals.values.fold(
-        0.0,
-        (sum, amount) => sum + amount,
-      );
-
-      final result = categoryTotals.entries.map((entry) {
-        final percentage = totalExpenses > 0
-            ? (entry.value / totalExpenses) * 100
-            : 0.0;
-
-        return CategoryBreakdown(
-          category: entry.key,
-          amount: entry.value,
-          percentage: percentage,
-          color: const Color(0xFF9E9E9E),
-        );
-      }).toList();
-
-      result.sort((a, b) => b.amount.compareTo(a.amount));
-      return result;
-    });
-  }
-
-  Future<List<PeriodSpending>> getSpendingTrend({DateTime? startDate, DateTime? endDate}) {
-    var query = select(transactionsTable);
-    return query.get().then((transactions) {
-      final filtered = _filterByDate(transactions, startDate, endDate);
-      final Map<String, double> monthlyTotals = {};
-
-      for (var transaction in filtered) {
-        if (transaction.type == 'expense') {
-          final month = '${transaction.date.year}-${transaction.date.month.toString().padLeft(2, '0')}';
-          monthlyTotals.update(
-            month,
-            (value) => value + transaction.amount,
-            ifAbsent: () => transaction.amount,
-          );
-        }
-      }
-
-      final result = monthlyTotals.entries.map((entry) {
-        return PeriodSpending(
-          label: entry.key,
-          amount: entry.value,
-        );
-      }).toList();
-
-      result.sort((a, b) => a.label.compareTo(b.label));
-      return result;
-    });
-  }
+ 
 
   List<TransactionsTableData> _filterByDate(
     List<TransactionsTableData> transactions,

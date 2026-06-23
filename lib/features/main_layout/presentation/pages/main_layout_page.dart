@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:smart_expense/core/constants/app_routes.dart';
 import 'package:smart_expense/core/di/injection_container.dart';
 import 'package:smart_expense/core/theme/app_colors.dart';
-import 'package:smart_expense/features/analytics/presentation/cubit/analytics_cubit.dart';
 import 'package:smart_expense/features/expenses/presentation/pages/transactions_page.dart';
 import 'package:smart_expense/features/home/presentation/pages/home_page.dart';
 import 'package:smart_expense/features/main_layout/presentation/widgets/custom_bottom_nav.dart';
@@ -37,7 +36,6 @@ class _MainLayoutPageState extends State<MainLayoutPage> {
     // Load data on app start
     sl<OperationCubit>().getOperations();
     sl<WalletCubit>().getWallets();
-    sl<AnalyticsCubit>().loadAnalytics();
     sl<ProfileCubit>().getProfileStats();
     sl<CashDrawerCubit>().getCashDrawer();
     sl<WalletAdjustmentCubit>().loadAllAdjustments();
@@ -60,7 +58,6 @@ class _MainLayoutPageState extends State<MainLayoutPage> {
       providers: [
         BlocProvider.value(value: sl<OperationCubit>()),
         BlocProvider.value(value: sl<WalletCubit>()),
-        BlocProvider.value(value: sl<AnalyticsCubit>()),
         BlocProvider.value(value: sl<ProfileCubit>()),
         BlocProvider.value(value: sl<CashDrawerCubit>()),
         BlocProvider.value(value: sl<WalletAdjustmentCubit>()),
@@ -76,7 +73,6 @@ class _MainLayoutPageState extends State<MainLayoutPage> {
               context.read<CashDrawerCubit>().refreshCashDrawer();
               context.read<WalletAdjustmentCubit>().refreshAllAdjustments();
               context.read<ProfileCubit>().silentReload();
-              context.read<AnalyticsCubit>().silentReload();
               context.read<WalletCubit>().getWallets();
               context.read<ActiveShiftCubit>().loadActiveShift();
               context.read<DebtCubit>().loadOutstandingDebt();
